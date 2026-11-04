@@ -95,5 +95,4 @@ I wrote a spec and project instructions first (CLAUDE.md, docs/SPEC.md, docs/TAS
 - Metrics dashboard and persisted miss counts per slug (misses → links people expect)
 - Browser extension or DNS setup so `go/` works without the host
 - E2E tests with Playwright (the UI is currently verified manually)
-- Move Fastify's deprecated `requestIdLogLabel` / `disableRequestLogging` options to `logController` (warnings today; removed in Fastify 6)
 - Serve the built web app from the same server for a single-process deployment
