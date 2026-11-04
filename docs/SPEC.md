@@ -89,7 +89,9 @@ Body: `{ "slug": string, "url": string, "description"?: string }`
 | Code | Status | When |
 |---|---|---|
 | `VALIDATION_ERROR` | 400 | Body or params fail validation (`details` per field) |
+| `VALIDATION_ERROR` | 400 / 413 / 415 | Request rejected before validation: malformed JSON, body too large, unsupported `Content-Type` (keeps the HTTP status, no `details`) |
 | `LINK_NOT_FOUND` | 404 | Unknown slug on the API |
+| `NOT_FOUND` | 404 | Unknown route |
 | `SLUG_TAKEN` | 409 | Duplicate slug |
 | `INTERNAL_ERROR` | 500 | Anything unexpected (generic message, details only in logs) |
 
