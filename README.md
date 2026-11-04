@@ -10,6 +10,9 @@ Requires Node.js 26 (LTS) and pnpm. The version is pinned in `.nvmrc` (`nvm use`
     pnpm dev           # API on :3000, web on http://localhost:5173
     pnpm test
     pnpm typecheck
+    pnpm test:e2e      # Playwright, Chromium; starts both dev servers (or reuses running ones)
+
+Before the first `pnpm test:e2e`, download the browser once: `pnpm exec playwright install chromium`. The e2e tests share the dev servers' in-memory data, so each test creates its own uniquely named links.
 
 Try it: open http://localhost:5173/go/oncall, or http://localhost:5173/go/new-thing to see the "create it" flow. (The seed links point to placeholder `example.com` hosts, so the destination page itself won't load.)
 
@@ -52,6 +55,7 @@ Every error looks like this and carries the same ID as the `x-request-id` respon
     server/repo/       LinkRepository interface + in-memory implementation
     web/src/           React app: api.ts (typed fetch), hooks.ts, components/
     test/              validation unit tests + API tests via app.inject()
+    e2e/               Playwright browser tests (create, validation, search, copy, redirects, keyboard)
 
 ## Working on it with Claude Code
 
@@ -107,5 +111,4 @@ I wrote a spec and project instructions first (CLAUDE.md, docs/SPEC.md, docs/TAS
 - Detect broken destinations (periodic checks)
 - Metrics dashboard and persisted miss counts per slug (misses → links people expect)
 - Browser extension or DNS setup so `go/` works without the host
-- E2E tests with Playwright (the UI is currently verified manually)
 - Serve the built web app from the same server for a single-process deployment

@@ -70,6 +70,7 @@ epam-go-links/
 | `pnpm dev` | Server on :3000 and Vite on :5173 together |
 | `pnpm test` | Run Vitest once |
 | `pnpm typecheck` | `tsc --noEmit` |
+| `pnpm test:e2e` | Playwright end-to-end tests (`e2e/`, Chromium); starts or reuses both dev servers |
 | `pnpm build` | Build the web app (server runs with tsx) |
 
 ## Rules for the agent
