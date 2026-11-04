@@ -4,6 +4,7 @@ import type { Link } from "../shared/link.ts";
 import { buildApp } from "../server/app.ts";
 import type { ErrorBody } from "../server/errors.ts";
 import { InMemoryLinkRepository } from "../server/repo/in-memory-link-repository.ts";
+import type { MetricsResponse } from "../server/routes/metrics.ts";
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 
@@ -150,5 +151,28 @@ describe("request IDs and error format", () => {
     expect(response.statusCode).toBe(500);
     expect(response.json<ErrorBody>().error.code).toBe("INTERNAL_ERROR");
     expect(response.body).not.toContain("secrets");
+  });
+});
+
+describe("GET /api/metrics", () => {
+  async function getMetrics(): Promise<MetricsResponse> {
+    const response = await app.inject({ url: "/api/metrics" });
+    expect(response.statusCode).toBe(200);
+    return response.json<MetricsResponse>();
+  }
+
+  it("starts with the seed links and no traffic", async () => {
+    expect(await getMetrics()).toEqual({ links: 3, redirects: 0, misses: 0 });
+  });
+
+  it("counts links, redirects and misses, but not invalid names", async () => {
+    await createLink({ slug: "team-wiki", url: "https://wiki.example.com/team" });
+    await app.inject({ url: "/go/oncall" });
+    await app.inject({ url: "/go/oncall" });
+    await app.inject({ url: "/go/payroll" });
+    await app.inject({ url: "/go/unknown" });
+    await app.inject({ url: "/go/Hello%20World!" });
+
+    expect(await getMetrics()).toEqual({ links: 4, redirects: 3, misses: 1 });
   });
 });
