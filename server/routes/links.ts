@@ -29,6 +29,7 @@ export const linkRoutes: FastifyPluginAsync<{ repo: LinkRepository }> = async (a
     const input = createLinkSchema.parse(request.body);
     try {
       const link = await repo.create(input);
+      request.log.info({ event: "link_created", slug: link.slug }, "link_created");
       reply.code(201).header("location", `/api/links/${link.slug}`);
       return link;
     } catch (error) {
