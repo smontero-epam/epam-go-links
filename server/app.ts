@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { IncomingMessage } from "node:http";
-import Fastify, { type FastifyInstance, type FastifyServerOptions } from "fastify";
+import Fastify, { LogController, type FastifyInstance, type FastifyServerOptions } from "fastify";
 import { errorHandler, notFoundHandler } from "./errors.ts";
 import { RedirectMetrics } from "./metrics.ts";
 import type { LinkRepository } from "./repo/link-repository.ts";
@@ -28,9 +28,11 @@ export function buildApp({ repo, logger = true }: AppDeps): FastifyInstance {
   const app = Fastify({
     logger,
     genReqId: requestIdFor,
-    requestIdLogLabel: "requestId",
-    // Replaced by the single summary line in onResponse below.
-    disableRequestLogging: true,
+    logController: new LogController({
+      requestIdLogLabel: "requestId",
+      // Replaced by the single summary line in onResponse below.
+      disableRequestLogging: true,
+    }),
   });
 
   app.addHook("onRequest", async (request, reply) => {
