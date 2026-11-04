@@ -4,7 +4,7 @@ A small internal go-links service: create memorable shortcuts like `go/oncall` a
 
 ## Run it
 
-Requires Node.js 26 (LTS) and pnpm.
+Requires Node.js 26 (LTS) and pnpm. The version is pinned in `.nvmrc` (`nvm use`, `fnm use`, etc.).
 
     pnpm install
     pnpm dev           # API on :3000, web on http://localhost:5173
