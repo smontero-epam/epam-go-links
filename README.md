@@ -53,6 +53,19 @@ Every error looks like this and carries the same ID as the `x-request-id` respon
     web/src/           React app: api.ts (typed fetch), hooks.ts, components/
     test/              validation unit tests + API tests via app.inject()
 
+## Working on it with Claude Code
+
+Read `CLAUDE.md` (rules) and `docs/SPEC.md` (contract) first. The `.claude/` folder adds:
+
+| | Name | Use it for |
+|---|---|---|
+| Skill | `task-workflow` | One task end to end: branch, implement against the spec, verify, summary + PR text |
+| Skill | `verify-ui` | Running the app and checking a change in the browser, keyboard only, then cleaning up processes |
+| Agent | `unit-test-writer` | Vitest unit/API tests (`test/`), via `app.inject()` |
+| Agent | `e2e-test-writer` | Playwright tests (`e2e/`); on first use it asks before installing Playwright |
+
+Skills load when a request matches them (or call them as `/task-workflow`, `/verify-ui`). Ask for an agent by name, e.g. "use the e2e-test-writer agent to cover the create flow".
+
 ## Observability
 
 - One JSON log line per request: `method`, `url`, `statusCode`, `durationMs`, `requestId`.
