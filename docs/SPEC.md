@@ -73,6 +73,10 @@ Body: `{ "slug": string, "url": string, "description"?: string }`
 ### `GET /health`
 - `200` with `{ "status": "ok" }`.
 
+### `GET /api/metrics`
+- `200` with `{ "links": number, "redirects": number, "misses": number }`.
+- `redirects` is the sum of all links' `visits`. `misses` counts redirects for valid but unknown slugs (`link_miss`); invalid names are not counted. `misses` is in memory and resets on restart.
+
 ### Error format (all errors)
 
 ```json
@@ -101,6 +105,7 @@ Body: `{ "slug": string, "url": string, "description"?: string }`
 - Domain log events with fields: `link_created { slug }`, `link_redirect { slug, visits }`, `link_miss { slug }`.
 - `visits` and `lastVisitedAt` per link, shown in the UI.
 - `GET /health` for load balancers and uptime checks.
+- `GET /api/metrics` for totals: links, redirects and misses.
 
 ## 6. Web UI
 

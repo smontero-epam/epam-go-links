@@ -20,8 +20,51 @@ function summary(count: number, query: string): string {
   return query ? `${count} ${noun} matching “${query}”` : `${count} ${noun}`;
 }
 
+type SortOrder = "slug" | "visits";
+
+const SORT_ANNOUNCEMENTS: Record<SortOrder, string> = {
+  slug: "Sorted by shortcut name, A to Z",
+  visits: "Sorted by visits, most visited first",
+};
+
+// The API already returns links sorted by slug, so only "visits" needs sorting here.
+function sortLinks(links: Link[], order: SortOrder): Link[] {
+  if (order === "slug") {
+    return links;
+  }
+  return [...links].sort((a, b) => b.visits - a.visits || a.slug.localeCompare(b.slug));
+}
+
+type SortButtonProps = {
+  label: string;
+  direction: "ascending" | "descending";
+  active: boolean;
+  onClick: () => void;
+};
+
+// The sort state is conveyed by aria-sort on the header cell; the arrow is visual only.
+function SortButton({ label, direction, active, onClick }: SortButtonProps) {
+  const arrow = direction === "ascending" ? "▲" : "▼";
+  return (
+    <button type="button" className="sort-button" onClick={onClick}>
+      {label}
+      <span className="sort-indicator" aria-hidden="true">
+        {active ? arrow : "↕"}
+      </span>
+    </button>
+  );
+}
+
 export function LinkList({ state, onRetry, announce }: LinkListProps) {
   const [copiedSlug, setCopiedSlug] = useState<string>();
+  const [sortOrder, setSortOrder] = useState<SortOrder>("slug");
+
+  function changeSort(order: SortOrder) {
+    if (order !== sortOrder) {
+      setSortOrder(order);
+      announce(SORT_ANNOUNCEMENTS[order]);
+    }
+  }
 
   useEffect(() => {
     if (!copiedSlug) {
@@ -75,11 +118,27 @@ export function LinkList({ state, onRetry, announce }: LinkListProps) {
         <table>
           <thead>
             <tr>
-              <th scope="col">Shortcut</th>
+              <th scope="col" aria-sort={sortOrder === "slug" ? "ascending" : undefined}>
+                <SortButton
+                  label="Shortcut"
+                  direction="ascending"
+                  active={sortOrder === "slug"}
+                  onClick={() => changeSort("slug")}
+                />
+              </th>
               <th scope="col">Destination</th>
               <th scope="col">Description</th>
-              <th scope="col" className="numeric">
-                Visits
+              <th
+                scope="col"
+                className="numeric"
+                aria-sort={sortOrder === "visits" ? "descending" : undefined}
+              >
+                <SortButton
+                  label="Visits"
+                  direction="descending"
+                  active={sortOrder === "visits"}
+                  onClick={() => changeSort("visits")}
+                />
               </th>
               <th scope="col">
                 <span className="visually-hidden">Actions</span>
@@ -87,7 +146,7 @@ export function LinkList({ state, onRetry, announce }: LinkListProps) {
             </tr>
           </thead>
           <tbody>
-            {state.links.map((link) => (
+            {sortLinks(state.links, sortOrder).map((link) => (
               <LinkRow
                 key={link.slug}
                 link={link}

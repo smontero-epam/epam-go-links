@@ -34,6 +34,7 @@ Full contract in [docs/SPEC.md](docs/SPEC.md).
 | `POST /api/links` | `201` + `Location`, `400 VALIDATION_ERROR`, or `409 SLUG_TAKEN` |
 | `GET /go/:slug` | `302` to the URL; unknown → `/?missing=`, invalid → `/?invalid=` |
 | `GET /health` | `200 { "status": "ok" }` |
+| `GET /api/metrics` | `200 { links, redirects, misses }` (misses reset on restart) |
 
 Every error looks like this and carries the same ID as the `x-request-id` response header:
 
@@ -58,7 +59,8 @@ Every error looks like this and carries the same ID as the `x-request-id` respon
 - Domain events: `link_created { slug }`, `link_redirect { slug, visits }`, `link_miss { slug }`.
 - A valid incoming `x-request-id` (8–64 chars of `[A-Za-z0-9_-]`) is reused, so logs can be correlated across services; otherwise a UUID is generated.
 - Unexpected errors are logged with the stack; clients only get `INTERNAL_ERROR` and the request ID. The UI shows that ID in error messages, so a user report can be matched to the log line.
-- `visits` and `lastVisitedAt` per link, shown in the UI.
+- `visits` and `lastVisitedAt` per link, shown in the UI; the list can be sorted by visits.
+- `GET /api/metrics`: total links, redirects (sum of visits) and misses (unknown slugs people tried).
 
 ## Assumptions
 
@@ -90,7 +92,7 @@ I wrote a spec and project instructions first (CLAUDE.md, docs/SPEC.md, docs/TAS
 - Persistent storage (Postgres) with migrations
 - SSO + link ownership, edit/delete with an audit trail
 - Detect broken destinations (periodic checks)
-- Metrics endpoint/dashboard (top links, misses → links people expect)
+- Metrics dashboard and persisted miss counts per slug (misses → links people expect)
 - Browser extension or DNS setup so `go/` works without the host
 - E2E tests with Playwright (the UI is currently verified manually)
 - Move Fastify's deprecated `requestIdLogLabel` / `disableRequestLogging` options to `logController` (warnings today; removed in Fastify 6)
