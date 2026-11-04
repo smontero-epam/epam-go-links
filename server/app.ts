@@ -5,6 +5,7 @@ import { errorHandler, notFoundHandler } from "./errors.ts";
 import type { LinkRepository } from "./repo/link-repository.ts";
 import { healthRoutes } from "./routes/health.ts";
 import { linkRoutes } from "./routes/links.ts";
+import { redirectRoutes } from "./routes/redirect.ts";
 
 export type AppDeps = {
   repo: LinkRepository;
@@ -51,6 +52,7 @@ export function buildApp({ repo, logger = true }: AppDeps): FastifyInstance {
 
   app.register(healthRoutes);
   app.register(linkRoutes, { prefix: "/api/links", repo });
+  app.register(redirectRoutes, { repo });
 
   return app;
 }
