@@ -30,6 +30,9 @@ epam-go-links/
 ├── vite.config.ts          # root: web/, proxy to http://localhost:3000
 ├── README.md
 ├── CLAUDE.md
+├── .claude/
+│   ├── skills/             # task-workflow, verify-ui
+│   └── agents/             # unit-test-writer, e2e-test-writer
 ├── docs/
 │   ├── SPEC.md
 │   └── TASKS.md
