@@ -123,8 +123,8 @@ Try it: open http://localhost:5173/go/oncall, or http://localhost:5173/go/new-th
 - **pnpm**: fast installs and a strict dependency tree (no phantom dependencies).
 - No editing/deleting yet: it needs ownership rules first (who can change a link?).
 
-## How I used AI
-I wrote a spec and project instructions first (CLAUDE.md, docs/SPEC.md, docs/TASKS.md), then used Claude Code task by task, reviewing every diff and running the tests after each step.
+## How it was built
+The spec and project instructions came first (CLAUDE.md, docs/SPEC.md, docs/TASKS.md); the code was then written with Claude Code task by task, reviewing every diff and running the tests after each step.
 
 ## Next steps
 - Persistent storage (Postgres) with migrations
