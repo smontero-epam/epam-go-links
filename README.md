@@ -88,9 +88,9 @@ Skills load when a request matches them (or call them as `/task-workflow`, `/ver
 
 ## Trade-offs
 
-- **In-memory storage**, behind a `LinkRepository` interface: zero setup to run; data resets on restart. Swapping in SQLite/Postgres means one new class implementing the interface (with a unique index on `slug`, since the repository is what guarantees uniqueness) passed to `buildApp({ repo })` in `server/index.ts`.
+- **In-memory storage**, behind a `LinkRepository` interface: zero setup for reviewers; data resets on restart. Swapping in SQLite/Postgres means one new class implementing the interface (with a unique index on `slug`, since the repository is what guarantees uniqueness) passed to `buildApp({ repo })` in `server/index.ts`.
 - **302 instead of 301** so link targets can change. All redirects send `Cache-Control: no-store`, so a "missing" redirect doesn't stick once the link is created.
-- **Fastify over NestJS** for a small service: built-in logging and request IDs with less ceremony.
+- **Fastify over NestJS** for a 60-minute scope: built-in logging and request IDs with less ceremony.
 - **One package** instead of a monorepo: simpler to run; split into pnpm workspaces later if it grows.
 - **pnpm**: fast installs and a strict dependency tree (no phantom dependencies). `pnpm-workspace.yaml` only exists because pnpm 12 records the esbuild build-script approval there.
 - No editing/deleting yet: it needs ownership rules first (who can change a link?).
@@ -100,11 +100,11 @@ Skills load when a request matches them (or call them as `/task-workflow`, `/ver
 - **Table that scrolls sideways on small screens** instead of collapsing into cards, so it keeps real table semantics for screen readers.
 - **The submit button uses `aria-disabled` while saving** instead of `disabled`, so keyboard focus isn't lost; repeat submits are still ignored.
 
-## How it was built
+## How I used AI
 
-The spec and project instructions came first (CLAUDE.md, docs/SPEC.md, docs/TASKS.md); the code was then written with Claude Code task by task, one branch and pull request per task, reviewing every diff and running the typecheck and tests after each step. Where the spec had a gap (error codes for unknown routes and Fastify's own 4xx errors), the agent stopped and asked instead of guessing, and the decision went back into the spec. The UI was checked by driving Chrome with the keyboard only, which caught a real bug (the page scrolled sideways at phone width).
+I wrote a spec and project instructions first (CLAUDE.md, docs/SPEC.md, docs/TASKS.md), then used Claude Code task by task, one branch and pull request per task, reviewing every diff and running the typecheck and tests after each step. Where the spec had a gap (error codes for unknown routes and Fastify's own 4xx errors), the agent stopped and asked instead of guessing, and the decision went back into the spec. The UI was checked by driving Chrome with the keyboard only, which caught a real bug (the page scrolled sideways at phone width).
 
-## Next steps
+## With another day
 
 - Persistent storage (Postgres) with migrations
 - SSO + link ownership, edit/delete with an audit trail
