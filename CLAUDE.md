@@ -4,9 +4,9 @@ Context for Claude Code. Read this file, then `docs/SPEC.md`, before doing any t
 
 ## What this is
 
-A small internal **go links** service (`go/design-system` → `https://…`), built as a **60-minute interview exercise**. It is the first iteration a team would keep developing, so favor clarity and good judgment over features.
+A small internal **go links** service (`go/design-system` → `https://…`). It is the first iteration a team will keep developing, so favor clarity and good judgment over features.
 
-The evaluators care about: API design, validation, error handling, accessibility, maintainable code, project organization, observability and documentation. They explicitly do **not** want auth, Docker, CI/CD or deployment work.
+Priorities: API design, validation, error handling, accessibility, maintainable code, project organization, observability and documentation. Auth, Docker, CI/CD and deployment work are out of scope.
 
 ## Stack (decided; don't change without asking)
 
