@@ -17,14 +17,14 @@ gh pr merge --squash --delete-branch         # after reviewing the PR yourself
 ```
 
 - **Squash merge** keeps one clean commit per task on `main`.
-- In each PR description write two lines: what changed and how you verified it. Interviewers may read them.
-- To save time, you can review and merge your own PRs; no approvals are required for this exercise.
+- In each PR description write two lines: what changed and how you verified it.
+- You can review and merge your own PRs; no approvals are required.
 
-Time budget: 60 minutes in total. If you're running late, skip what's marked *optional* and write it under "Next steps" in the README.
+Tasks marked *optional* can be skipped; list anything skipped under "Next steps" in the README.
 
 ---
 
-## Task 1 — Scaffold (≈5 min)
+## Task 1 — Scaffold
 - Create `package.json` (`"type": "module"`, `"engines": { "node": ">=26" }`, `"packageManager": "pnpm@<output of pnpm -v>"`), `tsconfig.json` (strict), `vite.config.ts` with the proxy, and the folder layout from `CLAUDE.md`.
 - Install with pnpm: `pnpm add fastify zod react react-dom` and `pnpm add -D typescript tsx vite @vitejs/plugin-react vitest concurrently @types/react @types/react-dom @types/node`.
 - pnpm blocks dependency install scripts by default. If it warns about `esbuild` (used by Vite and tsx), allow it with `pnpm approve-builds` or `"pnpm": { "onlyBuiltDependencies": ["esbuild"] }` in `package.json`.
@@ -34,14 +34,14 @@ Time budget: 60 minutes in total. If you're running late, skip what's marked *op
 **Done when:** `pnpm dev` starts both processes and `pnpm typecheck` passes.
 **Branch:** `chore/scaffold` · **Commit:** `chore: scaffold project`
 
-## Task 2 — Shared validation (≈5 min)
+## Task 2 — Shared validation
 - `shared/link.ts`: `normalizeSlug`, zod schemas for slug, URL, description and the create payload, following SPEC §3 (reserved words, http/https only, lengths). Export the `Link` type.
 - `test/link-validation.test.ts`: valid slugs, normalization (`"Design-System "`), invalid characters, double hyphens, reserved words, `javascript:` URL, relative URL, too-long values.
 
 **Done when:** tests pass.
 **Branch:** `feat/link-validation` · **Commit:** `feat: shared link validation`
 
-## Task 3 — Repository + API (≈10 min)
+## Task 3 — Repository + API
 - `LinkRepository` interface: `list(query?)`, `get(slug)`, `create(input)`, `recordVisit(slug)`.
 - `InMemoryLinkRepository` with a `Map` and the seed data from SPEC §2.
 - `server/errors.ts`: `AppError(code, status, message, details?)` and a Fastify error handler producing the SPEC §4 error format (zod errors → `VALIDATION_ERROR` with field details; unknown errors → `INTERNAL_ERROR` without leaking details).
@@ -51,13 +51,13 @@ Time budget: 60 minutes in total. If you're running late, skip what's marked *op
 **Done when:** typecheck passes and manual `curl` calls return the status codes in the SPEC.
 **Branch:** `feat/links-api` · **Commit:** `feat: links API with validation and error handling`
 
-## Task 4 — Redirect route (≈5 min)
+## Task 4 — Redirect route
 - `GET /go/:slug` per SPEC §4: 302 + `Cache-Control: no-store` and visit count; unknown → `/?missing=<slug>`; invalid → `/?invalid=<raw>`.
 - Domain log events: `link_created`, `link_redirect`, `link_miss`.
 
 **Branch:** `feat/redirect` · **Commit:** `feat: go/:slug redirect`
 
-## Task 5 — API tests (≈5 min)
+## Task 5 — API tests
 `test/api.test.ts` with `app.inject()` and a fresh repository per test:
 1. `POST` valid → 201, `Location` header, then appears in `GET /api/links`.
 2. `POST` duplicate → 409 `SLUG_TAKEN`.
@@ -68,7 +68,7 @@ Time budget: 60 minutes in total. If you're running late, skip what's marked *op
 
 **Branch:** `test/api` · **Commit:** `test: API behavior`
 
-## Task 6 — Web UI (≈15 min)
+## Task 6 — Web UI
 - `web/src/api.ts`: typed `listLinks`, `createLink`; parse the error JSON into `{ code, message, fieldErrors }`.
 - `App.tsx`: header, banner for `?missing` / `?invalid`, `CreateLinkForm`, `SearchBox`, `LinkList`.
 - Follow SPEC §6 for states (loading, empty, no results, error + retry), copy button, `aria-live` status, field errors with `aria-describedby`, focus management.
@@ -77,12 +77,12 @@ Time budget: 60 minutes in total. If you're running late, skip what's marked *op
 **Done when:** you can create a link, see it, search it, copy it and visit it; errors show under the right field; it works with the keyboard only.
 **Branch:** `feat/web-ui` · **Commit:** `feat: web UI`
 
-## Task 7 — README (≈10 min, write it yourself with AI help)
+## Task 7 — README
 Use the README skeleton below. Keep it honest and short.
 
 **Branch:** `docs/readme` · **Commit:** `docs: README`
 
-## Task 8 — Optional, only if time remains
+## Task 8 — Optional
 - Visit count sorting toggle, or "most visited" badge.
 - A `GET /api/metrics` endpoint with total links, redirects and misses.
 
@@ -116,17 +116,17 @@ Try it: open http://localhost:5173/go/oncall, or http://localhost:5173/go/new-th
 - In production, `go` would be a DNS alias pointing to this service.
 
 ## Trade-offs
-- **In-memory storage**, behind a `LinkRepository` interface: zero setup for reviewers; data resets on restart. Swapping in SQLite/Postgres means one new repository class.
+- **In-memory storage**, behind a `LinkRepository` interface: zero setup to run; data resets on restart. Swapping in SQLite/Postgres means one new repository class.
 - **302 instead of 301** so link targets can change.
-- **Fastify over NestJS** for a 60-minute scope: built-in logging and request IDs with less ceremony.
+- **Fastify over NestJS** for a small service: built-in logging and request IDs with less ceremony.
 - **One package** instead of a monorepo: simpler to run; split into pnpm workspaces later if it grows.
 - **pnpm**: fast installs and a strict dependency tree (no phantom dependencies).
 - No editing/deleting yet: it needs ownership rules first (who can change a link?).
 
-## How I used AI
-I wrote a spec and project instructions first (CLAUDE.md, docs/SPEC.md, docs/TASKS.md), then used Claude Code task by task, reviewing every diff and running the tests after each step.
+## How it was built
+The spec and project instructions came first (CLAUDE.md, docs/SPEC.md, docs/TASKS.md); the code was then written with Claude Code task by task, reviewing every diff and running the tests after each step.
 
-## With another day
+## Next steps
 - Persistent storage (Postgres) with migrations
 - SSO + link ownership, edit/delete with an audit trail
 - Detect broken destinations (periodic checks)
